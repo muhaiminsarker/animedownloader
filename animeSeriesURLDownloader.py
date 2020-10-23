@@ -3,17 +3,24 @@ Anime Series URL Downloader
 Author: Muhaimin Sarker
 Started: October 2, 2020
 """
-
 import requests
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
 driver_path = "C:/Users/sarke/Desktop/Programming/Projects/Anime Downloader/chromedriver.exe"
+#For my use, I use Brave Browser as my default browser and make it work using that. 
+#Brave Browser is best because ads and other things are removed automatically from webpages 
+##This allows me to web scrape a lot more easier
 brave_path = "C:/Program Files (x86)/BraveSoftware/Brave-Browser/Application/brave.exe"
 
 option = webdriver.ChromeOptions()
 option.binary_location = brave_path
+
+#Adds a headless feature so that Chrome can run in background
+option.add_argument("--headless")
+#Makes sure that error messages don't pop up unless they are fatal
+option.add_argument('log-level=3')
 
 # Create new Instance of Chrome
 def pageFinder(link):
@@ -31,22 +38,51 @@ def pageFinder(link):
     return pages
 
 
-def downloadURL(link):
-    """
-    Returns the string with the download link for the specific episode using a singular episode link
-    """
-    browser = webdriver.Chrome(executable_path=driver_path, chrome_options=option)
-    browser.get(link)
-    browser.add_cookie({"name": "res", "value": "1080"})
-    browser.get(link)
-    soup = BeautifulSoup(browser.page_source, "html.parser")
-    browser.quit()
+# Working function as other one doesn't work for EVERY SINGLE ANIME
+# One link at a time
+# def downloadURL(link):
+#     """
+#     Returns the string with the download link for the specific episode using a singular episode link
+#     """
+#     browser = webdriver.Chrome(executable_path=driver_path, chrome_options=option)
+#     browser.get(link)
+#     browser.add_cookie({"name": "res", "value": "1080"})
+#     browser.get(link)
+    
+#     soup = BeautifulSoup(browser.page_source, "html.parser")
+#     soup = soup.prettify()
 
-    scriptData= soup.find_all("script")
-    urlScript= str(scriptData[5])
-    urlLocation= urlScript.find("kwik.cx/e")
-    urlEndLocation= urlScript.find('";')
-    return urlScript[urlLocation:urlEndLocation].replace("/e/", "/f/")
+#     urlLocation= soup.find("kwik.cx/e")
+#     urlEndLocation= soup.find('";', urlLocation)
+#     return soup[urlLocation:urlEndLocation].replace("/e/", "/f/")
+
+def downloadURL(start, end, links):
+    """
+    Returns the list with all download links for the specific episode using a singular episode link
+    """
+    allDownload = []
+    browser = webdriver.Chrome(executable_path=driver_path, chrome_options=option)
+    browser.get(links[start-1])
+    browser.add_cookie({"name": "res", "value": "1080"})
+    browser.get(links[start-1])
+
+    soup = BeautifulSoup(browser.page_source, "html.parser")
+    soup = soup.prettify()
+
+    urlLocation= soup.find("kwik.cx/e")
+    urlEndLocation= soup.find('";', urlLocation)
+    allDownload.append(soup[urlLocation:urlEndLocation].replace("/e/", "/f/"))
+    
+
+    for i in range(start, end):
+        browser.get(links[i])
+        soup = BeautifulSoup(browser.page_source, "html.parser")
+        soup = soup.prettify()
+
+        urlLocation= soup.find("kwik.cx/e")
+        urlEndLocation= soup.find('";', urlLocation)
+        allDownload.append(soup[urlLocation:urlEndLocation].replace("/e/", "/f/"))
+    return allDownload
 
 def selectedDownloadURLs(start, end, episodeURLList, name):
     """
@@ -54,8 +90,7 @@ def selectedDownloadURLs(start, end, episodeURLList, name):
     Return text file name
     """
     f= open(name + " Episodes " + str(start) + " - " + str(end) + ".txt", "w")
-    # firstStatement = "These are the download links for episodes " + str(start) + " to " + str(end) + " for " + name + "\n" 
-    # f.write(firstStatement)
-    for i in range(start-1, end):
-        f.write(downloadURL(episodeURLList[i]) + "\n")
+    allDownloads = downloadURL(start, end, episodeURLList)
+    for i in allDownloads:
+        f.write(i + "\n")
     return name + " Episodes " + str(start) + " - " + str(end) + ".txt"
