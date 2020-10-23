@@ -8,6 +8,7 @@ Started: September 30, 2020
 import animeSeriesURLDownloader
 import multiURLopener
 import os
+import string
 
 print("Welcome to the Anime Downloader! Here are 3 things you need to use the Anime Downloader:")
 print("1. An AnimePahe link of ANY episode of the anime" + "\n" + 
@@ -28,7 +29,18 @@ while episodeInput == False:
     except: 
         print("That is not a correct episode NUMBER")
 
-fileName = input("What would you like the name of your file to start with? " + "\n")
+fileNameInput = False
+invalidFileName = ["CON", "PRN", "AUX", "NUL", "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9"
+, "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"]
+
+while fileNameInput == False:
+    try:
+        fileName = input("What would you like the name of your file to start with? " + "\n")
+        assert fileName not in invalidFileName
+        fileNameInput = True
+    except: 
+        print("That is not a valid file name to start with")
+        
 animeSeriesURLDownloader.selectedDownloadURLs(startEpisode, endEpisode, episodeURLlist, fileName)
 
 print("Put all download links for your anime", "into a .txt file called", fileName + ".txt")
