@@ -14,8 +14,6 @@ brave_path = "C:/Program Files (x86)/BraveSoftware/Brave-Browser/Application/bra
 
 option = webdriver.ChromeOptions()
 option.binary_location = brave_path
-# option.add_argument("--incognito") OPTIONAL
-#option.add_argument("--headless")
 
 # Create new Instance of Chrome
 def pageFinder(link):
@@ -31,6 +29,7 @@ def pageFinder(link):
     for links in aTagData.find_all('a'):
         pages.append("http://animepahe.com" + links.get('href'))
     return pages
+
 
 def downloadURL(link):
     """
@@ -49,7 +48,6 @@ def downloadURL(link):
     urlEndLocation= urlScript.find('";')
     return urlScript[urlLocation:urlEndLocation].replace("/e/", "/f/")
 
-
 def selectedDownloadURLs(start, end, episodeURLList, name):
     """
     Write selected episode(s)' download links to a text file. 
@@ -59,5 +57,5 @@ def selectedDownloadURLs(start, end, episodeURLList, name):
     # firstStatement = "These are the download links for episodes " + str(start) + " to " + str(end) + " for " + name + "\n" 
     # f.write(firstStatement)
     for i in range(start-1, end):
-       f.write(downloadURL(episodeURLList[i]) + "\n")
+        f.write(downloadURL(episodeURLList[i]) + "\n")
     return name + " Episodes " + str(start) + " - " + str(end) + ".txt"
