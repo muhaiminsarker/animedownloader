@@ -37,25 +37,6 @@ def pageFinder(link):
         pages.append("http://animepahe.com" + links.get('href'))
     return pages
 
-
-# Working function as other one doesn't work for EVERY SINGLE ANIME
-# One link at a time
-# def downloadURL(link):
-#     """
-#     Returns the string with the download link for the specific episode using a singular episode link
-#     """
-#     browser = webdriver.Chrome(executable_path=driver_path, chrome_options=option)
-#     browser.get(link)
-#     browser.add_cookie({"name": "res", "value": "1080"})
-#     browser.get(link)
-    
-#     soup = BeautifulSoup(browser.page_source, "html.parser")
-#     soup = soup.prettify()
-
-#     urlLocation= soup.find("kwik.cx/e")
-#     urlEndLocation= soup.find('";', urlLocation)
-#     return soup[urlLocation:urlEndLocation].replace("/e/", "/f/")
-
 def downloadURL(start, end, links):
     """
     Returns the list with all download links for the specific episode using a singular episode link
@@ -89,8 +70,7 @@ def selectedDownloadURLs(start, end, episodeURLList, name):
     Write selected episode(s)' download links to a text file. 
     Return text file name
     """
-    f= open(name + " Episodes " + str(start) + " - " + str(end) + ".txt", "w")
+    f= open(name + ".txt", "w")
     allDownloads = downloadURL(start, end, episodeURLList)
     for i in allDownloads:
         f.write(i + "\n")
-    return name + " Episodes " + str(start) + " - " + str(end) + ".txt"
